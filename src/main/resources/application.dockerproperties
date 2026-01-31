@@ -1,0 +1,34 @@
+# Production database configuration
+%prod.quarkus.datasource.db-kind=postgresql
+%prod.quarkus.datasource.username=quarkus_test
+%prod.quarkus.datasource.password=quarkus_test
+%prod.quarkus.datasource.jdbc.url=jdbc:postgresql://localhost:15432/quarkus_test
+%prod.quarkus.datasource.jdbc.max-size=8
+%prod.quarkus.datasource.jdbc.min-size=2
+
+# Disable DevServices in test profile to avoid Docker/Testcontainers errors.
+# Connect directly to the manually running PostgreSQL container.
+%test.quarkus.datasource.devservices.enabled=false
+%test.quarkus.datasource.db-kind=postgresql
+%test.quarkus.datasource.username=quarkus_test
+%test.quarkus.datasource.password=quarkus_test
+%test.quarkus.datasource.jdbc.url=jdbc:postgresql://localhost:15432/quarkus_test
+
+# Development profile configuration
+# These settings are used when running `mvn quarkus:dev`.
+# Disable DevServices to avoid Docker/Testcontainers errors,
+# and connect directly to the manually running PostgreSQL container.
+%dev.quarkus.datasource.devservices.enabled=false
+%dev.quarkus.datasource.db-kind=postgresql
+%dev.quarkus.datasource.username=quarkus_test
+%dev.quarkus.datasource.password=quarkus_test
+%dev.quarkus.datasource.jdbc.url=jdbc:postgresql://localhost:15432/quarkus_test
+
+# Hibernate settings
+quarkus.hibernate-orm.database.generation=drop-and-create
+quarkus.hibernate-orm.log.sql=true
+quarkus.hibernate-orm.sql-load-script=import.sql
+
+# OpenAPI generator settings
+quarkus.openapi.generator.spec=warehouse-openapi.yaml
+quarkus.openapi.generator.base-package=com.warehouse.api
