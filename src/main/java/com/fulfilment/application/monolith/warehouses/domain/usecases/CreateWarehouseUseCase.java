@@ -16,7 +16,6 @@ public class CreateWarehouseUseCase implements CreateWarehouseOperation {
 
   @Override
   public void create(Warehouse warehouse) {
-    // TODO implement this method
 
     // if all went well, create the warehouse
     warehouseStore.create(warehouse);
