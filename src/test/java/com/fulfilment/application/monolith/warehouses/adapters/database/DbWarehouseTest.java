@@ -20,6 +20,7 @@ class DbWarehouseTest {
     @Test
     @Transactional
     void shouldPersistAndRetrieveDbWarehouse() {
+        em.createQuery("DELETE FROM DbWarehouse").executeUpdate();
         DbWarehouse db = new DbWarehouse();
         db.businessUnitCode = "BU-001";
         db.location = "LOC-001";

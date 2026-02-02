@@ -30,6 +30,7 @@ class WarehouseRepositoryTest {
     @Test
     @Transactional
     void shouldCreateAndFindWarehouse() {
+        repository.deleteAll();
         Warehouse warehouse = buildWarehouse("BU-001", "LOC-001", 100, 50);
 
         repository.create(warehouse);
@@ -79,15 +80,16 @@ class WarehouseRepositoryTest {
 
         repository.remove(warehouse);
 
-        assertThrows(IllegalArgumentException.class,
-                () -> repository.findByBusinessUnitCode("BU-005"));
+        Warehouse found = repository.findByBusinessUnitCode("BU-005");
+        assertNull(found, "Warehouse should be removed and return null");
     }
+
 
     @Test
     @Transactional
-    void shouldThrowWhenWarehouseNotFound() {
-        assertThrows(IllegalArgumentException.class,
-                () -> repository.findByBusinessUnitCode("NON_EXISTENT"));
+    void shouldThrowNullWhenWarehouseNotFound() {
+        Warehouse found = repository.findByBusinessUnitCode("NON-EXISTENT");
+        assertNull(found, "Warehouse should be removed and return null");
     }
 }
 

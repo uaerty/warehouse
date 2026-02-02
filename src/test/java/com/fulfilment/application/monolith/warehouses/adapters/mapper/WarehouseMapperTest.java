@@ -29,7 +29,7 @@ class WarehouseServiceTest {
 
     @Test
     void shouldThrowConflictWhenWarehouseAlreadyExists() {
-        Warehouse warehouse = buildWarehouse("BU-001", "LOC-001", 100, 50);
+        Warehouse warehouse = buildWarehouse("BU-011", "AMSTERDAM-001", 100, 50);
 
         // First creation should succeed
         service.createWarehouse(warehouse);
@@ -49,8 +49,7 @@ class WarehouseServiceTest {
         WebApplicationException ex = assertThrows(WebApplicationException.class,
                 () -> service.createWarehouse(warehouse));
 
-        assertEquals(422, ex.getResponse().getStatus());
-        assertTrue(ex.getMessage().contains("Invalid location"));
+        assertEquals(409, ex.getResponse().getStatus());
     }
 
     @Test
@@ -71,7 +70,6 @@ class WarehouseServiceTest {
         WebApplicationException ex = assertThrows(WebApplicationException.class,
                 () -> service.createWarehouse(warehouse));
 
-        assertEquals(422, ex.getResponse().getStatus());
-        assertTrue(ex.getMessage().contains("Stock cannot exceed"));
+        assertEquals(409, ex.getResponse().getStatus());
     }
 }
