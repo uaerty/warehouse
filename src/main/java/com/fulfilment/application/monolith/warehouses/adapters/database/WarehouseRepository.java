@@ -42,10 +42,8 @@ public class WarehouseRepository implements WarehouseStore, PanacheRepository<Db
     @Override
     public Warehouse findByBusinessUnitCode(String buCode) {
         DbWarehouse entity = this.find("businessUnitCode", buCode).firstResult();
-        if (entity == null) {
-            throw new IllegalArgumentException("Warehouse with businessUnitCode " + buCode + " not found");
-        }
-        return entity.toWarehouse();
+        return entity != null ? entity.toWarehouse() : null;
     }
+
 }
 

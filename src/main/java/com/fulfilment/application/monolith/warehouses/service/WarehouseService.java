@@ -1,6 +1,7 @@
 package com.fulfilment.application.monolith.warehouses.service;
 
 import com.fulfilment.application.monolith.location.LocationGateway;
+import com.fulfilment.application.monolith.location.LocationNotFoundException;
 import com.fulfilment.application.monolith.products.Product;
 import com.fulfilment.application.monolith.stores.Store;
 import com.fulfilment.application.monolith.warehouses.adapters.database.FulfillmentUnit;
@@ -10,6 +11,7 @@ import com.fulfilment.application.monolith.warehouses.domain.models.Location;
 import com.fulfilment.application.monolith.warehouses.domain.models.Warehouse;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import jakarta.ws.rs.WebApplicationException;
 
 import java.time.LocalDateTime;
@@ -30,6 +32,7 @@ public class WarehouseService {
         return warehouseRepository.getAll();
     }
 
+    @Transactional
     public com.fulfilment.application.monolith.warehouses.domain.models.Warehouse createWarehouse(
             com.fulfilment.application.monolith.warehouses.domain.models.Warehouse warehouse) {
 
@@ -40,10 +43,8 @@ public class WarehouseService {
         }
 
         // 2. Location Validation
-        Location location = locationGateway.resolveByIdentifier(warehouse.location);
-        if (location == null) {
-            throw new WebApplicationException("Invalid location '" + warehouse.location + "'.", 422);
-        }
+        try{
+            Location location = locationGateway.resolveByIdentifier(warehouse.location);
 
         // 3. Warehouse Creation Feasibility
         long existingCount = warehouseRepository.count("location", warehouse.location);
@@ -60,11 +61,16 @@ public class WarehouseService {
         if (warehouse.stock > warehouse.capacity) {
             throw new WebApplicationException("Stock cannot exceed warehouse capacity.", 422);
         }
+        }
+        catch (LocationNotFoundException e) {
+            throw new WebApplicationException("Invalid location '" + warehouse.location + "'.", 422);
+        }
 
         warehouseRepository.create(warehouse);
         return warehouse;
     }
 
+    @Transactional
     public com.fulfilment.application.monolith.warehouses.domain.models.Warehouse replaceWarehouse(
             String businessUnitCode,
             com.fulfilment.application.monolith.warehouses.domain.models.Warehouse newWarehouse) {
@@ -102,6 +108,7 @@ public class WarehouseService {
     }
 
 
+    @Transactional
     public FulfillmentUnit assignWarehouseToProduct(Store store, Warehouse warehouse, Product product) {
         // 1. Business Unit Code Verification (already in createWarehouse)
         if (warehouseRepository.findByBusinessUnitCode(warehouse.businessUnitCode) == null) {

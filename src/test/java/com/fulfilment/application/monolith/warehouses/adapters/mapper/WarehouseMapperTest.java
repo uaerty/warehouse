@@ -1,4 +1,4 @@
-package com.fulfilment.application.monolith.warehouses;
+package com.fulfilment.application.monolith.warehouses.adapters.mapper;
 
 import com.fulfilment.application.monolith.warehouses.domain.models.Warehouse;
 import com.fulfilment.application.monolith.warehouses.service.WarehouseService;
@@ -29,7 +29,7 @@ class WarehouseServiceTest {
 
     @Test
     void shouldThrowConflictWhenWarehouseAlreadyExists() {
-        Warehouse warehouse = buildWarehouse("BU-001", "AMSTERDAM-001", 100, 50);
+        Warehouse warehouse = buildWarehouse("BU-001", "LOC-001", 100, 50);
 
         // First creation should succeed
         service.createWarehouse(warehouse);
@@ -66,7 +66,7 @@ class WarehouseServiceTest {
 
     @Test
     void shouldThrowUnprocessableEntityWhenStockExceedsCapacity() {
-        Warehouse warehouse = buildWarehouse("BU-003", "AMSTERDAM-001", 100, 200);
+        Warehouse warehouse = buildWarehouse("BU-003", "LOC-003", 100, 200);
 
         WebApplicationException ex = assertThrows(WebApplicationException.class,
                 () -> service.createWarehouse(warehouse));
