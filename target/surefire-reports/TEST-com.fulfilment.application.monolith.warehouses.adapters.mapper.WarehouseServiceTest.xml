@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.fulfilment.application.monolith.products.ProductPersistenceTest" time="0.442" tests="1" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.fulfilment.application.monolith.warehouses.adapters.mapper.WarehouseServiceTest" time="0.08" tests="4" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="17"/>
     <property name="sun.cpu.isalist" value="amd64"/>
@@ -70,28 +70,105 @@
     <property name="io.netty.machineId" value="ec:f0:7a:b1:a2:ad:82:f1"/>
     <property name="java.class.version" value="61.0"/>
   </properties>
-  <testcase name="shouldPersistAndFindProduct" classname="com.fulfilment.application.monolith.products.ProductPersistenceTest" time="0.428">
+  <testcase name="shouldThrowConflictWhenWarehouseAlreadyExists" classname="com.fulfilment.application.monolith.warehouses.adapters.mapper.WarehouseServiceTest" time="0.033">
     <system-out><![CDATA[&amp#27;[35m[Hibernate]&amp#27;[0m 
     &amp#27;[34mselect&amp#27;[0m
-        nextval(&amp#27;[36m'Product_SEQ'&amp#27;[0m)
+        dw1_0.id,
+        dw1_0.archivedAt,
+        dw1_0.businessUnitCode,
+        dw1_0.capacity,
+        dw1_0.createdAt,
+        dw1_0.location,
+        dw1_0.stock 
+    &amp#27;[34mfrom&amp#27;[0m
+        warehouse dw1_0 
+    &amp#27;[34mwhere&amp#27;[0m
+        dw1_0.businessUnitCode=? 
+    &amp#27;[34mfetch&amp#27;[0m
+        first ? &amp#27;[34mrows&amp#27;[0m &amp#27;[34monly&amp#27;[0m
+&amp#27;[35m[Hibernate]&amp#27;[0m 
+    &amp#27;[34mselect&amp#27;[0m
+        count(*) 
+    &amp#27;[34mfrom&amp#27;[0m
+        warehouse dw1_0 
+    &amp#27;[34mwhere&amp#27;[0m
+        dw1_0.location=?
 &amp#27;[35m[Hibernate]&amp#27;[0m 
     &amp#27;[34minsert&amp#27;[0m 
     &amp#27;[34minto&amp#27;[0m
-        Product
-        (description, name, price, stock, id) 
+        warehouse
+        (archivedAt, businessUnitCode, capacity, createdAt, location, stock, id) 
     &amp#27;[34mvalues&amp#27;[0m
-        (?, ?, ?, ?, ?)
+        (?, ?, ?, ?, ?, ?, ?)
 &amp#27;[35m[Hibernate]&amp#27;[0m 
     &amp#27;[34mselect&amp#27;[0m
-        p1_0.id,
-        p1_0.description,
-        p1_0.name,
-        p1_0.price,
-        p1_0.stock 
+        dw1_0.id,
+        dw1_0.archivedAt,
+        dw1_0.businessUnitCode,
+        dw1_0.capacity,
+        dw1_0.createdAt,
+        dw1_0.location,
+        dw1_0.stock 
     &amp#27;[34mfrom&amp#27;[0m
-        Product p1_0 
+        warehouse dw1_0 
     &amp#27;[34mwhere&amp#27;[0m
-        p1_0.id=?
+        dw1_0.businessUnitCode=? 
+    &amp#27;[34mfetch&amp#27;[0m
+        first ? &amp#27;[34mrows&amp#27;[0m &amp#27;[34monly&amp#27;[0m
+]]></system-out>
+  </testcase>
+  <testcase name="shouldThrowUnprocessableEntityForInvalidLocation" classname="com.fulfilment.application.monolith.warehouses.adapters.mapper.WarehouseServiceTest" time="0.011">
+    <system-out><![CDATA[&amp#27;[35m[Hibernate]&amp#27;[0m 
+    &amp#27;[34mselect&amp#27;[0m
+        dw1_0.id,
+        dw1_0.archivedAt,
+        dw1_0.businessUnitCode,
+        dw1_0.capacity,
+        dw1_0.createdAt,
+        dw1_0.location,
+        dw1_0.stock 
+    &amp#27;[34mfrom&amp#27;[0m
+        warehouse dw1_0 
+    &amp#27;[34mwhere&amp#27;[0m
+        dw1_0.businessUnitCode=? 
+    &amp#27;[34mfetch&amp#27;[0m
+        first ? &amp#27;[34mrows&amp#27;[0m &amp#27;[34monly&amp#27;[0m
+]]></system-out>
+  </testcase>
+  <testcase name="shouldThrowNotFoundWhenReplacingNonExistingWarehouse" classname="com.fulfilment.application.monolith.warehouses.adapters.mapper.WarehouseServiceTest" time="0.01">
+    <system-out><![CDATA[&amp#27;[35m[Hibernate]&amp#27;[0m 
+    &amp#27;[34mselect&amp#27;[0m
+        dw1_0.id,
+        dw1_0.archivedAt,
+        dw1_0.businessUnitCode,
+        dw1_0.capacity,
+        dw1_0.createdAt,
+        dw1_0.location,
+        dw1_0.stock 
+    &amp#27;[34mfrom&amp#27;[0m
+        warehouse dw1_0 
+    &amp#27;[34mwhere&amp#27;[0m
+        dw1_0.businessUnitCode=? 
+    &amp#27;[34mfetch&amp#27;[0m
+        first ? &amp#27;[34mrows&amp#27;[0m &amp#27;[34monly&amp#27;[0m
+]]></system-out>
+  </testcase>
+  <testcase name="shouldThrowUnprocessableEntityWhenStockExceedsCapacity" classname="com.fulfilment.application.monolith.warehouses.adapters.mapper.WarehouseServiceTest" time="0.009">
+    <system-out><![CDATA[&amp#27;[35m[Hibernate]&amp#27;[0m 
+    &amp#27;[34mselect&amp#27;[0m
+        dw1_0.id,
+        dw1_0.archivedAt,
+        dw1_0.businessUnitCode,
+        dw1_0.capacity,
+        dw1_0.createdAt,
+        dw1_0.location,
+        dw1_0.stock 
+    &amp#27;[34mfrom&amp#27;[0m
+        warehouse dw1_0 
+    &amp#27;[34mwhere&amp#27;[0m
+        dw1_0.businessUnitCode=? 
+    &amp#27;[34mfetch&amp#27;[0m
+        first ? &amp#27;[34mrows&amp#27;[0m &amp#27;[34monly&amp#27;[0m
 ]]></system-out>
   </testcase>
 </testsuite>

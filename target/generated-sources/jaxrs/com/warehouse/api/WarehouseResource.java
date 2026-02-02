@@ -1,5 +1,7 @@
 package com.warehouse.api;
 
+import com.warehouse.api.beans.FulfillmentUnit;
+import com.warehouse.api.beans.FullfillCriteria;
 import com.warehouse.api.beans.Warehouse;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.Consumes;
@@ -50,4 +52,17 @@ public interface WarehouseResource {
   @Consumes("application/json")
   Warehouse replaceTheCurrentActiveWarehouse(@PathParam("businessUnitCode") String businessUnitCode,
       @NotNull Warehouse data);
+
+  /**
+   * <p>
+   * Implement the feature of associating Warehouses as fulfillment units of
+   * certain Products to determined Stores.
+   * </p>
+   * 
+   */
+  @Path("/fulfill")
+  @POST
+  @Produces("application/json")
+  @Consumes("application/json")
+  FulfillmentUnit associateWarehousesOfCertainProductsToDeterminedStores(@NotNull FullfillCriteria data);
 }

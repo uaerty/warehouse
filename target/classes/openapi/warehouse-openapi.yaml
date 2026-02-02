@@ -102,6 +102,30 @@ paths:
 
         '400':
           description: Invalid request parameters
+
+  /warehouse/fulfill:
+    post:
+      summary: Associate Warehouses of certain Products to determined Stores
+      description: |
+        Implement the feature of associating Warehouses as fulfillment units of certain Products to determined Stores.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FullfillCriteria'
+      responses:
+        '200':
+          description: Associate Warehouse unit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FulfillmentUnit'
+        '404':
+          description: Warehouse unit not found
+
+        '400':
+          description: Invalid request parameters
 components:
   schemas:
     Warehouse:
@@ -122,3 +146,54 @@ components:
         stock:
           type: integer
           example: 50
+    FullfillCriteria:
+      type: object
+      properties:
+        warehouseBusinessUnitCode:
+          type: string
+        storeId:
+          type: string
+        productId:
+          type: string
+    FulfillmentUnit:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        store:
+          $ref: '#/components/schemas/Store'
+        warehouse:
+          $ref: '#/components/schemas/Warehouse'
+        product:
+          $ref: '#/components/schemas/Product'
+      required:
+        - store
+        - warehouse
+        - product
+    Store:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        quantityProductsInStock:
+          type: integer
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+          format: double
+        stock:
+          type: integer
+
