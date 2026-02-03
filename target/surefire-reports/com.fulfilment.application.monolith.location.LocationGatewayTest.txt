@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: com.fulfilment.application.monolith.location.LocationGatewayTest
 -------------------------------------------------------------------------------
-Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 25.79 s -- in com.fulfilment.application.monolith.location.LocationGatewayTest
+Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 26.67 s -- in com.fulfilment.application.monolith.location.LocationGatewayTest

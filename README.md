@@ -1,4 +1,5 @@
 # Java Code Assignment
+[Java CI/CD](https://github.com/uaerty/warehouse/actions/workflows/ci.yml/badge.svg)
 
 This is a short code assignment that explores various aspects of software development, including API implementation, documentation, persistence layer handling, and testing.
 
