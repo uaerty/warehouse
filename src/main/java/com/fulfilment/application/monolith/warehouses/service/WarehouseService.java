@@ -4,6 +4,7 @@ import com.fulfilment.application.monolith.location.LocationGateway;
 import com.fulfilment.application.monolith.location.LocationNotFoundException;
 import com.fulfilment.application.monolith.products.Product;
 import com.fulfilment.application.monolith.stores.Store;
+import com.fulfilment.application.monolith.warehouses.adapters.database.DbWarehouse;
 import com.fulfilment.application.monolith.warehouses.adapters.database.FulfillmentUnit;
 import com.fulfilment.application.monolith.warehouses.adapters.database.FulfillmentUnitRepository;
 import com.fulfilment.application.monolith.warehouses.adapters.database.WarehouseRepository;
@@ -13,6 +14,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.Response;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -43,26 +45,25 @@ public class WarehouseService {
         }
 
         // 2. Location Validation
-        try{
+        try {
             Location location = locationGateway.resolveByIdentifier(warehouse.location);
 
-        // 3. Warehouse Creation Feasibility
-        long existingCount = warehouseRepository.count("location", warehouse.location);
-        if (existingCount >= location.maxNumberOfWarehouses) {
-            throw new WebApplicationException(
-                    "Cannot create warehouse at location '" + warehouse.location + "'. Maximum number of warehouses reached.", 422);
-        }
+            // 3. Warehouse Creation Feasibility
+            long existingCount = warehouseRepository.count("location", warehouse.location);
+            if (existingCount >= location.maxNumberOfWarehouses) {
+                throw new WebApplicationException(
+                        "Cannot create warehouse at location '" + warehouse.location + "'. Maximum number of warehouses reached.", 422);
+            }
 
-        // 4. Capacity and Stock Validation
-        if (warehouse.capacity > location.maxCapacity) {
-            throw new WebApplicationException(
-                    "Capacity exceeds maximum allowed for location '" + warehouse.location + "'.", 422);
-        }
-        if (warehouse.stock > warehouse.capacity) {
-            throw new WebApplicationException("Stock cannot exceed warehouse capacity.", 422);
-        }
-        }
-        catch (LocationNotFoundException e) {
+            // 4. Capacity and Stock Validation
+            if (warehouse.capacity > location.maxCapacity) {
+                throw new WebApplicationException(
+                        "Capacity exceeds maximum allowed for location '" + warehouse.location + "'.", 422);
+            }
+            if (warehouse.stock > warehouse.capacity) {
+                throw new WebApplicationException("Stock cannot exceed warehouse capacity.", 422);
+            }
+        } catch (LocationNotFoundException e) {
             throw new WebApplicationException("Invalid location '" + warehouse.location + "'.", 422);
         }
 
@@ -77,21 +78,34 @@ public class WarehouseService {
 
         var oldWarehouse = warehouseRepository.findByBusinessUnitCode(businessUnitCode);
         if (oldWarehouse == null) {
-            throw new WebApplicationException("Warehouse with business unit code '" + businessUnitCode + "' does not exist.", 404);
+            throw new WebApplicationException("Warehouse with business unit code '" + businessUnitCode + "' does not exist.", Response.Status.NOT_FOUND);
         }
 
-        // 5. Capacity Accommodation
+        // Capacity Accommodation
         if (newWarehouse.capacity < oldWarehouse.stock) {
-            throw new WebApplicationException("New warehouse capacity cannot accommodate stock.", 422);
+            throw new WebApplicationException("New warehouse capacity cannot accommodate stock.", Response.Status.fromStatusCode(422));
         }
 
-        // 6. Stock Matching
+        // Stock Matching
         if (!Objects.equals(newWarehouse.stock, oldWarehouse.stock)) {
-            throw new WebApplicationException("Stock of new warehouse must match stock of the warehouse being replaced.", 422);
+            throw new WebApplicationException("Stock of new warehouse must match stock of the warehouse being replaced.", Response.Status.fromStatusCode(422));
         }
 
-        warehouseRepository.update(newWarehouse);
+        DbWarehouse dbOld = DbWarehouse.fromWarehouse(oldWarehouse);
+        DbWarehouse dbNew = DbWarehouse.fromWarehouse(newWarehouse);
+
+        // Archive old warehouse
+        oldWarehouse.archivedAt = LocalDateTime.now();
+        warehouseRepository.persist(List.of(dbOld));
+
+        // Create new warehouse with same businessUnitCode
+        newWarehouse.businessUnitCode = businessUnitCode;
+        newWarehouse.createdAt = LocalDateTime.now();
+        warehouseRepository.persist(List.of(dbNew));
+
         return newWarehouse;
+
+
     }
 
     public com.fulfilment.application.monolith.warehouses.domain.models.Warehouse findByBusinessUnitCode(String buCode) {
