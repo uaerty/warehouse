@@ -78,14 +78,9 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Start application
-        run: |
-          nohup ./mvnw quarkus:dev &
-          sleep 30
-
-      - name: Health check endpoint
+      - name: Start application and wait for health
         run: | 
-          nohup ./mvnw quarkus:run & 
+          nohup mvn quarkus:run & 
           for i in {1..30}; do 
             if curl -s http://localhost:8080/q/health > /dev/null; then 
               echo "App is up!" 
