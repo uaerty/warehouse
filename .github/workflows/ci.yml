@@ -1,3 +1,11 @@
+name: Java CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -36,3 +44,45 @@ jobs:
 
       - name: Run unit tests
         run: mvn test
+
+  health-check:
+    runs-on: ubuntu-latest
+    needs: build
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_USER: quarkus_test
+          POSTGRES_PASSWORD: quarkus_test
+          POSTGRES_DB: quarkus_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U quarkus_test"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    env:
+      DB_USER: quarkus_test
+      DB_PASSWORD: quarkus_test
+      DB_URL: jdbc:postgresql://localhost:5432/quarkus_test
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Start application
+        run: |
+          nohup ./mvnw quarkus:dev &
+          sleep 30
+
+      - name: Health check endpoint
+        run: |
+          curl -f http://localhost:8080/q/health || exit 1
