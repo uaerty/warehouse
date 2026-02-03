@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:13.3
+        image: postgres:13
         env:
           POSTGRES_USER: quarkus_test
           POSTGRES_PASSWORD: quarkus_test
@@ -84,5 +84,14 @@ jobs:
           sleep 30
 
       - name: Health check endpoint
-        run: |
-          curl -f http://localhost:8080/q/health || exit 1
+        run: | 
+          nohup ./mvnw quarkus:run & 
+          for i in {1..30}; do 
+            if curl -s http://localhost:8080/q/health > /dev/null; then 
+              echo "App is up!" 
+              exit 0 
+            fi 
+            sleep 2 
+          done 
+          echo "App failed to start" 
+          exit 1
