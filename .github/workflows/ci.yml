@@ -18,7 +18,7 @@ jobs:
           POSTGRES_PASSWORD: quarkus_test
           POSTGRES_DB: quarkus_test
         ports:
-          - 15432:5432
+          - 5432:5432
         options: >-
           --health-cmd="pg_isready -U quarkus_test"
           --health-interval=10s
@@ -57,7 +57,7 @@ jobs:
           POSTGRES_PASSWORD: quarkus_test
           POSTGRES_DB: quarkus_test
         ports:
-          - 15432:5432
+          - 5432:5432
         options: >-
           --health-cmd="pg_isready -U quarkus_test"
           --health-interval=10s
