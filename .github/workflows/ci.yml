@@ -28,22 +28,19 @@ jobs:
     env:
       DB_USER: quarkus_test
       DB_PASSWORD: quarkus_test
-      DB_URL: jdbc:postgresql://localhost:5432/quarkus_test
+      DB_URL: jdbc:postgresql://postgres:5432/quarkus_test
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Build with Maven
-        run: mvn clean install -DskipTests=false
+      - name: Build
+        run: mvn package -DskipTests
 
-      - name: Run unit tests
+      - name: Test
         run: mvn test
 
   health-check:
@@ -67,27 +64,24 @@ jobs:
     env:
       DB_USER: quarkus_test
       DB_PASSWORD: quarkus_test
-      DB_URL: jdbc:postgresql://localhost:5432/quarkus_test
+      DB_URL: jdbc:postgresql://postgres:5432/quarkus_test
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Start application and wait for health
-        run: | 
-          nohup mvn quarkus:run & 
-          for i in {1..30}; do 
-            if curl -s http://localhost:8080/q/health > /dev/null; then 
-              echo "App is up!" 
-              exit 0 
-            fi 
-            sleep 2 
-          done 
-          echo "App failed to start" 
+      - name: Start app and wait for health
+        run: |
+          nohup java -jar target/quarkus-app/quarkus-run.jar &
+          for i in {1..60}; do
+            if curl -s http://localhost:8080/q/health > /dev/null; then
+              echo "App is up!"
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "App failed to start"
           exit 1
